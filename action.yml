@@ -1,11 +1,31 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: "Your name here"
+description: "Provide a description here"
+author: "Your name or organization here"
 inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  main-branch:
+    required: false
+    description: Name of the main branch
+    default: main
+  path:
+    required: false
+    description: Path to your schema.prisma file
+    default: prisma/schema.prisma
+  warning:
+    required: false
+    description: Post a comment in the PR warning about the potentially unsafe migration
+    default: true
+  message:
+    required: false
+    description: The warning message to post when potentially unsafe migrations are detected
+    default: "This PR contains potentially unsafe migrations. Please review the changes and make sure they are safe."
+  repeat:
+    required: false
+    description: Whether to repeat warnings or not
+    default: false
+  fail:
+    required: false
+    description: "Whether to fail or not when potentially unsafe migrations are detected"
+    default: false
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node16"
+  main: "dist/index.js"
