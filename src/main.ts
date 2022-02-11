@@ -40,12 +40,6 @@ async function run(): Promise<void> {
 			const repeat = core.getBooleanInput("repeat");
 			const message = core.getInput("message");
 
-			if (fail) {
-				core.setFailed(
-					"Potentially unsafe Prisma migration detected. Please separate migration changes into their own Pull Request."
-				);
-			}
-
 			if (warning) {
 				const id = getPullRequestId();
 				const comments = await octokit.issues.listComments({
@@ -65,6 +59,12 @@ async function run(): Promise<void> {
 						body: message,
 					});
 				}
+			}
+
+			if (fail) {
+				core.setFailed(
+					"Potentially unsafe Prisma migration detected. Please separate migration changes into their own Pull Request."
+				);
 			}
 		}
 		core.info(`No potentially unsafe Prisma migration detected.`);

@@ -1,4 +1,4 @@
-name: Ian Mitchell
+name: prisma-migration-warning
 description: Checks Pull Requests for potentially unsafe Prisma Migrations
 author: ianmitchell
 inputs:
