@@ -1,6 +1,8 @@
 name: prisma-migration-warning
 description: Checks Pull Requests for potentially unsafe Prisma Migrations
 author: ianmitchell
+icon: database
+color: purple
 inputs:
   main-branch:
     required: false
