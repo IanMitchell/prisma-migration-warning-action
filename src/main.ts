@@ -1,16 +1,27 @@
+import fs from "node:fs";
 import * as core from "@actions/core";
+import { Octokit } from "@octokit/action";
 import { $ } from "zx";
+
+const octokit = new Octokit();
+const [OWNER, REPOSITORY] = process.env.GITHUB_REPOSITORY!.split("/");
+
+function getPullRequestId() {
+	const ev = JSON.parse(
+		fs.readFileSync(process.env.GITHUB_EVENT_PATH!, "utf8")
+	);
+	return ev.pull_request.number;
+}
 
 async function getSchemaRemovalCount(mainBranch: string, path: string) {
 	const { stdout } =
-		await $`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path} | awk '{ print $2}'`;
+		await $`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/prisma.schema | awk '{ print $2}'`;
 	return parseInt(stdout.trim(), 10);
 }
 
-// TODO: Ignore anything under `prisma/*` (migration files)
-async function getModifiedFileCount(mainBranch: string) {
+async function getModifiedFileCount(mainBranch: string, path: string) {
 	const { stdout } =
-		await $`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat | wc -l`;
+		await $`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat -- . :^${path} | wc -l`;
 
 	return parseInt(stdout.trim(), 10);
 }
@@ -21,13 +32,13 @@ async function run(): Promise<void> {
 		const path = core.getInput("path");
 
 		const schemaRemovalCount = await getSchemaRemovalCount(mainBranch, path);
-		const modifiedFileCount = await getModifiedFileCount(mainBranch);
+		const modifiedFileCount = await getModifiedFileCount(mainBranch, path);
 
 		if (schemaRemovalCount > 0 && modifiedFileCount > 0) {
 			const warning = core.getBooleanInput("warning");
 			const fail = core.getBooleanInput("fail");
 			const repeat = core.getBooleanInput("repeat");
-			const message = core.getMultilineInput("message");
+			const message = core.getInput("message");
 
 			if (fail) {
 				core.setFailed(
@@ -36,9 +47,24 @@ async function run(): Promise<void> {
 			}
 
 			if (warning) {
-				// Get previous comments
-				// check if it exists && repeat
-				// create comment with message
+				const id = getPullRequestId();
+				const comments = await octokit.issues.listComments({
+					owner: OWNER,
+					repo: REPOSITORY,
+					issue_number: id,
+				});
+				const isWarningPosted = comments.data.some(
+					(comment) => comment.body === message
+				);
+
+				if (!isWarningPosted || (isWarningPosted && repeat)) {
+					octokit.issues.createComment({
+						owner: OWNER,
+						repo: REPOSITORY,
+						issue_number: id,
+						body: message,
+					});
+				}
 			}
 		}
 		core.info(`No potentially unsafe Prisma migration detected.`);
