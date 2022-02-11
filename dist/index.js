@@ -54,6 +54,7 @@ const octokit = new action_1.Octokit();
 const [OWNER, REPOSITORY] = process.env.GITHUB_REPOSITORY.split("/");
 function getPullRequestId() {
     const ev = JSON.parse(node_fs_1.default.readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"));
+    console.log(ev);
     return ev.pull_request.number;
 }
 function getSchemaRemovalCount(mainBranch, path) {
@@ -74,15 +75,16 @@ function run() {
             const mainBranch = core.getInput("main-branch");
             const path = core.getInput("path");
             const schemaRemovalCount = yield getSchemaRemovalCount(mainBranch, path);
+            console.log(`Detected ${schemaRemovalCount} lines removed`);
             const modifiedFileCount = yield getModifiedFileCount(mainBranch, path);
+            console.log(`Detected ${modifiedFileCount} modified files`);
             if (schemaRemovalCount > 0 && modifiedFileCount > 0) {
                 const warning = core.getBooleanInput("warning");
                 const fail = core.getBooleanInput("fail");
                 const repeat = core.getBooleanInput("repeat");
                 const message = core.getInput("message");
-                if (fail) {
-                    core.setFailed("Potentially unsafe Prisma migration detected. Please separate migration changes into their own Pull Request.");
-                }
+                console.log(`Options: Warning [${warning}], Fail [${fail}], Repeat [${repeat}]`);
+                console.log(`Message: \n${message}`);
                 if (warning) {
                     const id = getPullRequestId();
                     const comments = yield octokit.issues.listComments({
@@ -99,6 +101,9 @@ function run() {
                             body: message,
                         });
                     }
+                }
+                if (fail) {
+                    core.setFailed("Potentially unsafe Prisma migration detected. Please separate migration changes into their own Pull Request.");
                 }
             }
             core.info(`No potentially unsafe Prisma migration detected.`);
