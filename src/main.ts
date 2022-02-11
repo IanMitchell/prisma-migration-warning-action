@@ -10,6 +10,7 @@ function getPullRequestId() {
 	const ev = JSON.parse(
 		fs.readFileSync(process.env.GITHUB_EVENT_PATH!, "utf8")
 	);
+	console.log(ev);
 	return ev.pull_request.number;
 }
 
@@ -32,13 +33,19 @@ async function run(): Promise<void> {
 		const path = core.getInput("path");
 
 		const schemaRemovalCount = await getSchemaRemovalCount(mainBranch, path);
+		console.log(`Detected ${schemaRemovalCount} lines removed`);
 		const modifiedFileCount = await getModifiedFileCount(mainBranch, path);
+		console.log(`Detected ${modifiedFileCount} modified files`);
 
 		if (schemaRemovalCount > 0 && modifiedFileCount > 0) {
 			const warning = core.getBooleanInput("warning");
 			const fail = core.getBooleanInput("fail");
 			const repeat = core.getBooleanInput("repeat");
 			const message = core.getInput("message");
+			console.log(
+				`Options: Warning [${warning}], Fail [${fail}], Repeat [${repeat}]`
+			);
+			console.log(`Message: \n${message}`);
 
 			if (warning) {
 				const id = getPullRequestId();
