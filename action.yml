@@ -8,8 +8,8 @@ inputs:
     default: main
   path:
     required: false
-    description: Path to your schema.prisma file
-    default: prisma/schema.prisma
+    description: Path to your prisma directory
+    default: prisma
   warning:
     required: false
     description: Post a comment in the PR warning about the potentially unsafe migration
@@ -17,7 +17,10 @@ inputs:
   message:
     required: false
     description: The warning message to post when potentially unsafe migrations are detected
-    default: "This PR contains potentially unsafe migrations. Please review the changes and make sure they are safe."
+    default: |
+      | :warning: Migration Warning      |
+      |:---------------------------|
+      | It looks like this pull request modifies your Prisma schema in addition to other files. To minimize errors or downtime during deployment, make sure your schema changes don't rename or remove fields that are actively being used in production. You may want to separate your changes into two Pull Requests; one to change your application logic and another followup that updates your schema. |
   repeat:
     required: false
     description: Whether to repeat warnings or not
