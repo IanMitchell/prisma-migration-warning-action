@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import * as core from "@actions/core";
 import { Octokit } from "@octokit/action";
-import "zx/globals";
+import { $ } from "zx";
 
 const octokit = new Octokit();
 const [OWNER, REPOSITORY] = process.env.GITHUB_REPOSITORY!.split("/");
