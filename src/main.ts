@@ -33,26 +33,20 @@ async function run(): Promise<void> {
 		const mainBranch = core.getInput("main-branch");
 		const path = core.getInput("path");
 
-		console.log(`mainBranch: ${mainBranch}, path: ${path}`);
-
 		const schemaRemovalCount = await getSchemaRemovalCount(mainBranch, path);
-		console.log(`Detected ${schemaRemovalCount} lines removed`);
 		const modifiedFileCount = await getModifiedFileCount(mainBranch, path);
-		console.log(`Detected ${modifiedFileCount} modified files`);
+		console.log(
+			`Found ${schemaRemovalCount} removed lines and ${modifiedFileCount} modified files`
+		);
 
 		if (schemaRemovalCount > 0 && modifiedFileCount > 0) {
 			const warning = core.getBooleanInput("warning");
 			const fail = core.getBooleanInput("fail");
 			const repeat = core.getBooleanInput("repeat");
 			const message = core.getInput("message");
-			console.log(
-				`Options: Warning [${warning}], Fail [${fail}], Repeat [${repeat}]`
-			);
-			console.log(`Message: \n${message}`);
 
 			if (warning) {
 				const id = getPullRequestId();
-				console.log(`Commenting on Pull Request ${id}`);
 				const comments = await octokit.issues.listComments({
 					owner: OWNER,
 					repo: REPOSITORY,
@@ -61,7 +55,6 @@ async function run(): Promise<void> {
 				const isWarningPosted = comments.data.some(
 					(comment) => comment.body === message
 				);
-				console.log(`Is warning already posted: ${isWarningPosted}`);
 
 				if (!isWarningPosted || (isWarningPosted && repeat)) {
 					octokit.issues.createComment({
@@ -78,8 +71,9 @@ async function run(): Promise<void> {
 					"Potentially unsafe Prisma migration detected. Please separate migration changes into their own Pull Request."
 				);
 			}
+		} else {
+			core.info(`No potentially unsafe Prisma migration detected.`);
 		}
-		core.info(`No potentially unsafe Prisma migration detected.`);
 	} catch (error) {
 		if (error instanceof Error) core.setFailed(error.message);
 	}

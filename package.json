@@ -1,6 +1,6 @@
 {
 	"name": "prisma-migration-warning-action",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"private": true,
 	"description": "Warns about potentially unsafe Prisma Migrations",
 	"main": "lib/main.js",
