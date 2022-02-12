@@ -49,8 +49,8 @@ function getPullRequestId() {
     return ev.pull_request.number;
 }
 async function getSchemaRemovalCount(mainBranch, path) {
-    console.log(`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/prisma.schema | awk '{ print $2}'`);
-    const stdout = (0, node_child_process_1.execSync)(`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/prisma.schema | awk '{ print $2}'`);
+    console.log(`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/schema.prisma | awk '{ print $2}'`);
+    const stdout = (0, node_child_process_1.execSync)(`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/schema.prisma | awk '{ print $2}'`);
     return parseInt(stdout.toString().trim(), 10);
 }
 async function getModifiedFileCount(mainBranch, path) {

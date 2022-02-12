@@ -16,10 +16,10 @@ function getPullRequestId() {
 
 async function getSchemaRemovalCount(mainBranch: string, path: string) {
 	console.log(
-		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/prisma.schema | awk '{ print $2}'`
+		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/schema.prisma | awk '{ print $2}'`
 	);
 	const stdout = execSync(
-		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/prisma.schema | awk '{ print $2}'`
+		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/schema.prisma | awk '{ print $2}'`
 	);
 	return parseInt(stdout.toString().trim(), 10);
 }
