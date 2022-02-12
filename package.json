@@ -3,7 +3,6 @@
 	"version": "0.0.1",
 	"private": true,
 	"description": "Warns about potentially unsafe Prisma Migrations",
-	"type": "module",
 	"main": "lib/main.js",
 	"scripts": {
 		"build": "tsc",
@@ -32,7 +31,7 @@
 	"devDependencies": {
 		"@types/node": "^16.10.5",
 		"@typescript-eslint/parser": "^5.8.1",
-		"@vercel/ncc": "^0.31.1",
+		"@vercel/ncc": "^0.33.2",
 		"eslint": "^7.32.0",
 		"js-yaml": "^4.1.0",
 		"prettier": "2.5.1",
