@@ -15,6 +15,9 @@ function getPullRequestId() {
 }
 
 async function getSchemaRemovalCount(mainBranch: string, path: string) {
+	console.log(
+		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/prisma.schema | awk '{ print $2}'`
+	);
 	const stdout = execSync(
 		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/prisma.schema | awk '{ print $2}'`
 	);
@@ -22,6 +25,9 @@ async function getSchemaRemovalCount(mainBranch: string, path: string) {
 }
 
 async function getModifiedFileCount(mainBranch: string, path: string) {
+	console.log(
+		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat -- . :^${path} | wc -l`
+	);
 	const stdout = execSync(
 		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat -- . :^${path} | wc -l`
 	);
@@ -33,6 +39,8 @@ async function run(): Promise<void> {
 	try {
 		const mainBranch = core.getInput("main-branch");
 		const path = core.getInput("path");
+
+		console.log(`mainBranch: ${mainBranch}, path: ${path}`);
 
 		const schemaRemovalCount = await getSchemaRemovalCount(mainBranch, path);
 		console.log(`Detected ${schemaRemovalCount} lines removed`);
