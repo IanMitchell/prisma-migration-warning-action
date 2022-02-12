@@ -10,14 +10,10 @@ function getPullRequestId() {
 	const ev = JSON.parse(
 		fs.readFileSync(process.env.GITHUB_EVENT_PATH!, "utf8")
 	);
-	console.log(ev);
 	return ev.pull_request.number;
 }
 
 async function getSchemaRemovalCount(mainBranch: string, path: string) {
-	console.log(
-		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/schema.prisma | awk '{ print $2}'`
-	);
 	const stdout = execSync(
 		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/schema.prisma | awk '{ print $2}'`
 	);
@@ -25,9 +21,6 @@ async function getSchemaRemovalCount(mainBranch: string, path: string) {
 }
 
 async function getModifiedFileCount(mainBranch: string, path: string) {
-	console.log(
-		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat -- . :^${path} | wc -l`
-	);
 	const stdout = execSync(
 		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat -- . :^${path} | wc -l`
 	);
