@@ -52,6 +52,7 @@ async function run(): Promise<void> {
 
 			if (warning) {
 				const id = getPullRequestId();
+				console.log(`Commenting on Pull Request ${id}`);
 				const comments = await octokit.issues.listComments({
 					owner: OWNER,
 					repo: REPOSITORY,
@@ -60,6 +61,7 @@ async function run(): Promise<void> {
 				const isWarningPosted = comments.data.some(
 					(comment) => comment.body === message
 				);
+				console.log(`Is warning already posted: ${isWarningPosted}`);
 
 				if (!isWarningPosted || (isWarningPosted && repeat)) {
 					octokit.issues.createComment({
