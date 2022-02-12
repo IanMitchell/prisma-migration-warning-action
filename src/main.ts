@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import * as core from "@actions/core";
 import { Octokit } from "@octokit/action";
-import { $ } from "zx";
+import { execSync } from "node:child_process";
 
 const octokit = new Octokit();
 const [OWNER, REPOSITORY] = process.env.GITHUB_REPOSITORY!.split("/");
@@ -15,16 +15,18 @@ function getPullRequestId() {
 }
 
 async function getSchemaRemovalCount(mainBranch: string, path: string) {
-	const { stdout } =
-		await $`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/prisma.schema | awk '{ print $2}'`;
-	return parseInt(stdout.trim(), 10);
+	const stdout = execSync(
+		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat ${path}/prisma.schema | awk '{ print $2}'`
+	);
+	return parseInt(stdout.toString().trim(), 10);
 }
 
 async function getModifiedFileCount(mainBranch: string, path: string) {
-	const { stdout } =
-		await $`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat -- . :^${path} | wc -l`;
+	const stdout = execSync(
+		`git diff $(git log -n 1 origin/${mainBranch} --pretty=format:"%H") $(git log -n 1 --pretty=format:"%H") --numstat -- . :^${path} | wc -l`
+	);
 
-	return parseInt(stdout.trim(), 10);
+	return parseInt(stdout.toString().trim(), 10);
 }
 
 async function run(): Promise<void> {
