@@ -30,7 +30,7 @@
 	"devDependencies": {
 		"@types/node": "^16.10.5",
 		"@typescript-eslint/parser": "^5.8.1",
-		"@vercel/ncc": "^0.31.1",
+		"@vercel/ncc": "^0.36.1",
 		"eslint": "^7.32.0",
 		"js-yaml": "^4.1.0",
 		"prettier": "2.5.1",
